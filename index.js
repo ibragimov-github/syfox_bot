@@ -53,16 +53,20 @@ const resultCheck = async (result, msg) => {
         result.phoneNumber = text
         return bot.sendMessage(chatId, 'Как вам удобнее, чтобы мы с вами связались ?', optionsContact)
       }
-      if (result.howContact.phone || result.howContact.messenger.length) {
+      if (result.howContact.phone || result.howContact.messenger.length && !result.finalquestion.length) {
         await bot.sendMessage(chatId, 'Ваш запрос принят!')
         result.finalquestion = text
-        await bot.sendMessage(resultChatId, `
+        return bot.sendMessage(resultChatId, `
           Имя: ${result.name},
           Номер телефона: ${result.phoneNumber}, 
           Как связаться: ${result.howContact.phone ? 'по телефону' : result.howContact.messenger},
           Вопрос: ${result.finalquestion}
         `)
       }
+      if (result.finalquestion.length) {
+        return bot.sendMessage(chatId, 'Для повторного заполнения формы нажмите /start')
+      }
+
     }
   }
 
