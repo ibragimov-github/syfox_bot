@@ -25,7 +25,8 @@ const optionsMessage = {
 }
 bot.on('message', async msg => {
   const messageText = msg.text;
-  const resultChatId = '-573656434'
+  const resultChatId = '-1001773406853'
+  console.log(msg.chat.id)
   if (!(msg.chat.id in result)) {
     result[msg.chat.id] = {
       name: 'expects...',
