@@ -15,10 +15,11 @@ let result = {
     phone: '',
     messenger: ''
   },
-  finalquestion: ''
+  finalquestion: '',
+  formCompleted: false
 }
 
-const resultCheck = async (result, msg) => {
+const resultCheck = async (msg) => {
   const text = msg.text;
   const chatId = msg.chat.id;
   const resultChatId = '-573656434'
@@ -40,7 +41,8 @@ const resultCheck = async (result, msg) => {
           phone: '',
           messenger: ''
         },
-        finalquestion: ''
+        finalquestion: '',
+        formCompleted: false
       }
 
     }
@@ -53,8 +55,9 @@ const resultCheck = async (result, msg) => {
         result.phoneNumber = text
         return bot.sendMessage(chatId, 'Как вам удобнее, чтобы мы с вами связались ?', optionsContact)
       }
-      if (result.howContact.phone || result.howContact.messenger.length && !result.finalquestion.length) {
+      if (!result.formCompleted) {
         await bot.sendMessage(chatId, 'Ваш запрос принят!')
+        result.formCompleted = true
         result.finalquestion = text
         return bot.sendMessage(resultChatId, `
           Имя: ${result.name},
@@ -63,7 +66,7 @@ const resultCheck = async (result, msg) => {
           Вопрос: ${result.finalquestion}
         `)
       }
-      if (result.finalquestion.length) {
+      if (result.formCompleted) {
         return bot.sendMessage(chatId, 'Для повторного заполнения формы нажмите /start')
       }
 
@@ -73,7 +76,7 @@ const resultCheck = async (result, msg) => {
 }
 
 bot.on('message', msg => {
-  resultCheck(result, msg)
+  resultCheck(msg)
 })
 bot.on('callback_query', (msg) => {
   try {
