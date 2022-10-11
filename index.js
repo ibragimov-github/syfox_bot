@@ -8,34 +8,40 @@ bot.setMyCommands([
     description: 'Перезапуск бота'
   }
 ])
-let result = {
-  name: '',
-  phoneNumber: '',
-  howContact: {
-    phone: '',
-    messenger: ''
-  },
-  finalquestion: '',
-  formCompleted: false
+let result = {}
+const optionsContact = {
+  reply_markup: JSON.stringify({
+    inline_keyboard: [
+      [{ text: 'позвоните', callback_data: 'callme' }], [{ text: 'напишите в мессенджер', callback_data: 'textme' }]
+    ]
+  })
 }
-
-const resultCheck = async (msg) => {
-  const text = msg.text;
-  const chatId = msg.chat.id;
+const optionsMessage = {
+  reply_markup: JSON.stringify({
+    inline_keyboard: [
+      [{ text: 'WhatsApp', callback_data: 'whatsapp' }], [{ text: 'Telegram', callback_data: 'telegram' }]
+    ]
+  })
+}
+bot.on('message', async msg => {
+  const messageText = msg.text;
   const resultChatId = '-573656434'
-  const optionsContact = {
-    reply_markup: JSON.stringify({
-      inline_keyboard: [
-        [{ text: 'позвоните', callback_data: 'callme' }], [{ text: 'напишите в мессенджер', callback_data: 'textme' }]
-      ]
-    })
+  if (!(msg.chat.id in result)) {
+    result[msg.chat.id] = {
+      name: 'expects...',
+      phoneNumber: '',
+      howContact: {
+        phone: '',
+        messenger: ''
+      },
+      finalquestion: '',
+      formCompleted: false
+    }
   }
   if (msg.chat.type === 'private') {
-    if (text === '/start') {
-      await bot.sendMessage(chatId, 'Добро пожаловать в телеграм бот агентства')
-      await bot.sendMessage(chatId, 'Пожалуйста, введите своё имя')
-      result = {
-        name: '',
+    if (messageText === '/start') {
+      result[msg.chat.id] = {
+        name: 'expects...',
         phoneNumber: '',
         howContact: {
           phone: '',
@@ -44,64 +50,50 @@ const resultCheck = async (msg) => {
         finalquestion: '',
         formCompleted: false
       }
-
+      await bot.sendMessage(msg.chat.id, `Hey, guys! \n \n Это seyfox_bot, он поможет вам быстро сформулировать свой запрос и получить ответы на все ваши вопросы. \n \nEnjoy 😉`)
+      return bot.sendMessage(msg.chat.id, 'Пожалуйста, введите своё имя')
     }
-    else {
-      if (!result.name.length) {
-        result.name = text;
-        return bot.sendMessage(chatId, 'Пожалуйста, введите свой номер')
-      }
-      if (!result.phoneNumber.length) {
-        result.phoneNumber = text
-        return bot.sendMessage(chatId, 'Как вам удобнее, чтобы мы с вами связались ?', optionsContact)
-      }
-      if (!result.formCompleted) {
-        await bot.sendMessage(chatId, 'Ваш запрос принят!')
-        result.formCompleted = true
-        result.finalquestion = text
-        return bot.sendMessage(resultChatId, `
-          Имя: ${result.name},
-          Номер телефона: ${result.phoneNumber}, 
-          Как связаться: ${result.howContact.phone ? 'по телефону' : result.howContact.messenger},
-          Вопрос: ${result.finalquestion}
-        `)
-      }
-      if (result.formCompleted) {
-        return bot.sendMessage(chatId, 'Для повторного заполнения формы нажмите /start')
-      }
 
+    if (result[msg.chat.id].name === 'expects...') {
+      result[msg.chat.id].name = messageText;
+      return bot.sendMessage(msg.chat.id, 'Пожалуйста, введите свой номер');
+    }
+    if (result[msg.chat.id].name.length && !result[msg.chat.id].phoneNumber.length) {
+      result[msg.chat.id].phoneNumber = messageText;
+      return bot.sendMessage(msg.chat.id, 'Как вам удобнее, чтобы мы с вами связались ?', optionsContact)
+    }
+    if (!result[msg.chat.id].formCompleted && result[msg.chat.id].howContact.phone || result[msg.chat.id].howContact.messenger.length) {
+      result[msg.chat.id].finalquestion = messageText;
+      console.log(result[msg.chat.id])
+      result[msg.chat.id].formCompleted = true;
+      await bot.sendMessage(msg.chat.id, 'Ваш запрос принят!')
+      return bot.sendMessage(resultChatId, `
+        Имя: ${result[msg.chat.id].name},
+        Номер телефона: ${result[msg.chat.id].phoneNumber}, 
+        Как связаться: ${result[msg.chat.id].howContact.phone ? 'по телефону' : result[msg.chat.id].howContact.messenger},
+        Вопрос: ${result[msg.chat.id].finalquestion}
+      `)
+    }
+    if (result[msg.chat.id].formCompleted) {
+      await bot.sendMessage(msg.chat.id, 'Для повторного заполнения формы нажмите /start')
     }
   }
 
-}
-
-bot.on('message', msg => {
-  resultCheck(msg)
 })
-bot.on('callback_query', (msg) => {
-  try {
-    const optionsMessage = {
-      reply_markup: JSON.stringify({
-        inline_keyboard: [
-          [{ text: 'WhatsApp', callback_data: 'whatsapp' }], [{ text: 'Telegram', callback_data: 'telegram' }]
-        ]
-      })
+
+bot.on('callback_query', async msg => {
+  const buttonText = msg.data;
+  if (msg.message.chat.id in result) {
+    if (buttonText === 'callme') {
+      result[msg.message.chat.id].howContact.phone = true;
+      await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос/ чтобы вы хотели узнать')
     }
-    const text = msg.data;
-    const chatId = msg.message.chat.id;
-    if (text === 'callme') {
-      result.howContact.phone = true;
-      bot.sendMessage(chatId, 'Опишите кратко ваш вопрос/ чтобы вы хотели узнать')
+    if (buttonText === 'textme') {
+      await bot.sendMessage(msg.message.chat.id, 'Как вам удобнее, чтобы мы с вами связались ?', optionsMessage)
     }
-    if (text === 'textme') {
-      bot.sendMessage(chatId, 'Как вам удобнее, чтобы мы с вами связались ?', optionsMessage)
-    }
-    if (text === 'whatsapp' || text === 'telegram') {
-      result.howContact.messenger = text;
-      bot.sendMessage(chatId, 'Опишите кратко ваш вопрос/ чтобы вы хотели узнать')
+    if (buttonText === 'whatsapp' || buttonText === 'telegram') {
+      result[msg.message.chat.id].howContact.messenger = buttonText;
+      await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос/ чтобы вы хотели узнать')
     }
   }
-  catch (e) {
-    console.error(e)
-  }
-}) 
+})
