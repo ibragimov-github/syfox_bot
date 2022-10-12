@@ -62,9 +62,12 @@ bot.on('message', async msg => {
       result[msg.chat.id].phoneNumber = messageText;
       return bot.sendMessage(msg.chat.id, 'Как вам удобнее, чтобы мы с вами связались ?', optionsContact)
     }
-    if (!result[msg.chat.id].formCompleted && result[msg.chat.id].howContact.phone || result[msg.chat.id].howContact.messenger.length) {
+    if (!(result[msg.chat.id].formCompleted) && result[msg.chat.id].howContact.phone || !!result[msg.chat.id].howContact.messenger.length && !(result[msg.chat.id].formCompleted)) {
+      if (!result[msg.chat.id].formCompleted) {
+        console.log(true)
+      }
+      console.log(!result[msg.chat.id].formCompleted)
       result[msg.chat.id].finalquestion = messageText;
-      console.log(result[msg.chat.id])
       result[msg.chat.id].formCompleted = true;
       await bot.sendMessage(msg.chat.id, 'Ваш запрос принят!')
       return bot.sendMessage(resultChatId, `
