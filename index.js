@@ -26,7 +26,6 @@ const optionsMessage = {
 bot.on('message', async msg => {
   const messageText = msg.text;
   const resultChatId = '-1001773406853'
-  console.log(msg.chat.id)
   if (!(msg.chat.id in result)) {
     result[msg.chat.id] = {
       name: 'expects...',
@@ -90,7 +89,7 @@ bot.on('callback_query', async msg => {
       await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос/ чтобы вы хотели узнать')
     }
     if (buttonText === 'textme') {
-      await bot.sendMessage(msg.message.chat.id, 'Как вам удобнее, чтобы мы с вами связались ?', optionsMessage)
+      await bot.sendMessage(msg.message.chat.id, 'Выберите мессенджер', optionsMessage)
     }
     if (buttonText === 'whatsapp' || buttonText === 'telegram') {
       result[msg.message.chat.id].howContact.messenger = buttonText;
