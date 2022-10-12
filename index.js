@@ -50,7 +50,7 @@ bot.on('message', async msg => {
         finalquestion: '',
         formCompleted: false
       }
-      await bot.sendMessage(msg.chat.id, `Hey, guys! \n \n Это seyfox_bot, он поможет вам быстро сформулировать свой запрос и получить ответы на все ваши вопросы. \n \nEnjoy 😉`)
+      await bot.sendMessage(msg.chat.id, `Hey, guys! \n \nЭто seyfox_bot, он поможет вам быстро сформулировать свой запрос и получить ответы на все ваши вопросы. \n \nEnjoy 😉`)
       return bot.sendMessage(msg.chat.id, 'Пожалуйста, введите своё имя')
     }
 
@@ -86,14 +86,14 @@ bot.on('callback_query', async msg => {
   if (msg.message.chat.id in result) {
     if (buttonText === 'callme') {
       result[msg.message.chat.id].howContact.phone = true;
-      await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос/ чтобы вы хотели узнать')
+      await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос / чтобы вы хотели узнать')
     }
     if (buttonText === 'textme') {
       await bot.sendMessage(msg.message.chat.id, 'Выберите мессенджер', optionsMessage)
     }
     if (buttonText === 'whatsapp' || buttonText === 'telegram') {
       result[msg.message.chat.id].howContact.messenger = buttonText;
-      await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос/ чтобы вы хотели узнать')
+      await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос / чтобы вы хотели узнать')
     }
   }
 })
