@@ -69,7 +69,7 @@ bot.on('message', async msg => {
       console.log(!result[msg.chat.id].formCompleted)
       result[msg.chat.id].finalquestion = messageText;
       result[msg.chat.id].formCompleted = true;
-      await bot.sendMessage(msg.chat.id, 'Ваш запрос принят!')
+      await bot.sendMessage(msg.chat.id, 'Спасибо, что оставили заявку, мы изучим её и свяжемся с вами в скором времени.')
       return bot.sendMessage(resultChatId, `
         Имя: ${result[msg.chat.id].name},
         Номер телефона: ${result[msg.chat.id].phoneNumber}, 
