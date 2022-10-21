@@ -50,25 +50,28 @@ bot.on('message', async msg => {
         finalquestion: '',
         formCompleted: false
       }
+      await bot.sendAnimation(msg.chat.id, './gif-collection/gif-1.gif');
       await bot.sendMessage(msg.chat.id, `Hey, guys! \n \nЭто seyfox_bot, он поможет вам быстро сформулировать свой запрос и получить ответы на все ваши вопросы. \n \nEnjoy 😉`)
+      await bot.sendAnimation(msg.chat.id, './gif-collection/gif-2.gif');
       return bot.sendMessage(msg.chat.id, 'Пожалуйста, введите своё имя')
     }
 
     if (result[msg.chat.id].name === 'expects...') {
       result[msg.chat.id].name = messageText;
+      await bot.sendAnimation(msg.chat.id, './gif-collection/gif-3.gif');
       return bot.sendMessage(msg.chat.id, 'Пожалуйста, введите свой номер');
     }
     if (result[msg.chat.id].name.length && !result[msg.chat.id].phoneNumber.length) {
       result[msg.chat.id].phoneNumber = messageText;
+      await bot.sendAnimation(msg.chat.id, './gif-collection/gif-4.gif');
       return bot.sendMessage(msg.chat.id, 'Как вам удобнее, чтобы мы с вами связались ?', optionsContact)
     }
     if (!(result[msg.chat.id].formCompleted) && result[msg.chat.id].howContact.phone || !!result[msg.chat.id].howContact.messenger.length && !(result[msg.chat.id].formCompleted)) {
       if (!result[msg.chat.id].formCompleted) {
-        console.log(true)
       }
-      console.log(!result[msg.chat.id].formCompleted)
       result[msg.chat.id].finalquestion = messageText;
       result[msg.chat.id].formCompleted = true;
+      await bot.sendAnimation(msg.chat.id, './gif-collection/gif-7.gif');
       await bot.sendMessage(msg.chat.id, 'Спасибо, что оставили заявку, мы изучим её и свяжемся с вами в скором времени.')
       return bot.sendMessage(resultChatId, `
         Имя: ${result[msg.chat.id].name},
@@ -89,13 +92,16 @@ bot.on('callback_query', async msg => {
   if (msg.message.chat.id in result) {
     if (buttonText === 'callme') {
       result[msg.message.chat.id].howContact.phone = true;
+      await bot.sendAnimation(msg.message.chat.id, './gif-collection/gif-6-fast.gif');
       await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос / чтобы вы хотели узнать')
     }
     if (buttonText === 'textme') {
+      await bot.sendAnimation(msg.message.chat.id, './gif-collection/gif-5.gif');
       await bot.sendMessage(msg.message.chat.id, 'Выберите мессенджер', optionsMessage)
     }
     if (buttonText === 'whatsapp' || buttonText === 'telegram') {
       result[msg.message.chat.id].howContact.messenger = buttonText;
+      await bot.sendAnimation(msg.message.chat.id, './gif-collection/gif-6-fast.gif');
       await bot.sendMessage(msg.message.chat.id, 'Опишите кратко ваш вопрос / чтобы вы хотели узнать')
     }
   }
